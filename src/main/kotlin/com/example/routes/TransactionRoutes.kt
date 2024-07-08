@@ -12,13 +12,13 @@ import io.ktor.server.routing.*
 import io.ktor.server.locations.post
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-import kotlinx.coroutines.channels.BroadcastChannel
 import java.time.LocalDateTime
 
 const val TXS = "$API_VERSION/txs"
 const val CREATE_TXS = "$TXS/create"
 const val UPDATE_TXS = "$TXS/update"
 const val DELETE_TXS = "$TXS/delete"
+const val SUM_TXS = "$TXS/sum"
 
 @Location(CREATE_TXS)
 class TransactionCreateRoute
@@ -31,6 +31,9 @@ class TransactionDeleteRoute
 
 @Location(TXS)
 class TransactionGetRoute
+
+@Location(SUM_TXS)
+class TransactionGetSumRoute
 
 fun Route.TransactionRoutes(
     db: Repo,
@@ -91,6 +94,16 @@ fun Route.TransactionRoutes(
                 call.respond(HttpStatusCode.OK, SimpleResponse(true, "TX Deleted Succesfully"))
             }catch(e:Exception){
                 call.respond(HttpStatusCode.Conflict, SimpleResponse(false, e.message ?: "Some problem occured"))
+            }
+        }
+        get<TransactionGetSumRoute> {
+            try {
+                val email = call.principal<User>()!!.email
+                val transactions = db.getAllTransactions(email)
+                val sum = transactions.sumOf{it.amount}
+                call.respond(HttpStatusCode.OK,sum)
+            } catch (e:Exception) {
+                call.respond(HttpStatusCode.Conflict, emptyList<Transaction>())
             }
         }
     }
