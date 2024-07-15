@@ -19,6 +19,8 @@ const val CREATE_TXS = "$TXS/create"
 const val UPDATE_TXS = "$TXS/update"
 const val DELETE_TXS = "$TXS/delete"
 const val SUM_TXS = "$TXS/sum"
+const val CATEGORY_TXS = "$TXS/category"
+const val CATEGORY_TXS_SUM = "$TXS/category/sum"
 
 @Location(CREATE_TXS)
 class TransactionCreateRoute
@@ -34,6 +36,12 @@ class TransactionGetRoute
 
 @Location(SUM_TXS)
 class TransactionGetSumRoute
+
+@Location(CATEGORY_TXS)
+class TransactionGetCategoryRoute
+
+@Location(CATEGORY_TXS_SUM)
+class TransactionGetCategorySumRoute
 
 fun Route.TransactionRoutes(
     db: Repo,
@@ -103,6 +111,30 @@ fun Route.TransactionRoutes(
                 val sum = transactions.sumOf{it.amount}
                 call.respond(HttpStatusCode.OK,sum)
             } catch (e:Exception) {
+                call.respond(HttpStatusCode.Conflict, emptyList<Transaction>())
+            }
+        }
+        get<TransactionGetCategoryRoute>{
+            try {
+                val category = call.request.queryParameters["category"]!!
+                val email = call.principal<User>()!!.email
+                val transactions = db.getAllTransactions(email)
+                val sortedTransactions = transactions.filter { it.category == category }
+                call.respond(HttpStatusCode.OK,sortedTransactions)
+            } catch (e:Exception){
+                call.respond(HttpStatusCode.Conflict, emptyList<Transaction>())
+            }
+        }
+        get<TransactionGetCategorySumRoute>{
+            try {
+                val category = call.request.queryParameters["category"]!!
+                val email = call.principal<User>()!!.email
+                val transactions = db.getAllTransactions(email)
+                val sortedTransactions = transactions.filter { it.category == category }
+                val sum = sortedTransactions.sumOf{it.amount}
+
+                call.respond(HttpStatusCode.OK,sum)
+            } catch (e:Exception){
                 call.respond(HttpStatusCode.Conflict, emptyList<Transaction>())
             }
         }
