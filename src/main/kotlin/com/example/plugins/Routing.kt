@@ -44,42 +44,8 @@ fun Application.configureRouting() {
         TransactionRoutes(db,hashFunction)
 
         get("/") {
-            call.respondText("Hello World!")
+            call.respondText("Hello Arakis!")
         }
 
-        get("/note/{id}") {
-            val id = call.parameters["id"]
-            call.respond("$id")
-        }
-
-        get("/token") {
-            val email = call.request.queryParameters["email"]!!
-            val password = call.request.queryParameters["password"]!!
-            val username = call.request.queryParameters["username"]!!
-
-            val user = User(email, hashFunction(password), username)
-            call.respond(jwtService.generateToken(user))
-        }
-
-        get("/note") {
-            val id = call.request.queryParameters["id"]
-            call.respond("$id")
-        }
-
-        route("/notes") {
-
-            route("/create") {
-
-                post{
-                    val body = call.receive<String>()
-                    call.respond(body)
-                }
-            }
-
-            delete{
-                val body = call.receive<String>()
-                call.respond(body)
-            }
-        }
     }
 }
