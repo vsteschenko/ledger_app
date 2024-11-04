@@ -51,12 +51,14 @@ To set up the project on your local machine, follow these steps:
       "password": "password",
       "email": "email"
    }
+   
 10. **SIGN IN**
     Make a POST request to http://localhost:8080/v1/users/register, in body add:
    {
       "password": "password",
       "email": "email"
    }
+   
 11. **Add expense**
     Make a POST request to http://localhost:8080/v1/txs/create
     In Authorization choose Bearer Token and insert the message you received after sign up or sign in (protected).
@@ -66,14 +68,17 @@ To set up the project on your local machine, follow these steps:
       "amount": integer (positive or negative depending on whether its an income or expense)
       "location": "location"
     }
-13. **Get all transactions**
+    
+12. **Get all transactions**
     Make a GET request to http://localhost:8080/v1/txs
     Protected.
-14. **Delete a transaction**
+    
+13. **Delete a transaction**
     Make a DELETE request to http://localhost:8080/v1/txs/delete
     Protected.
     In params add id and its value should be a the id of the transaction you want to remove.
-15. **Update existing transaction**
+    
+14. **Update existing transaction**
     Make a POST request to http://localhost:8080/v1/txs/update
     Protected.
     {
@@ -84,14 +89,17 @@ To set up the project on your local machine, follow these steps:
        "location": "location"
     }
    If you wish to change only one property, you can remove all the rest and include only the one you change and the id of the tx.
-17. **Total**
+
+15. **Total**
     Make a GET request to http://localhost:8080/v1/txs/sum
     Protected.
-18. **Filter transaction by category**
+    
+16. **Filter transaction by category**
     Make a GET request to http://localhost:8080/v1/txs/category
     Protected.
     In params add category and in value add the name of the category.
-19. **Total by category**
+    
+17. **Total by category**
     Make a GET request to http://localhost:8080/v1/txs/category/sum
     Protected.
     In params add category and in value add the name of the category.
