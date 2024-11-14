@@ -62,13 +62,13 @@ fun Route.UserRoutes(
             val user = db.findUserByEmail(loginRequest.email)
 
             if(user == null){
-                call.respond(HttpStatusCode.BadRequest,SimpleResponse(false,"Wrong Email Id"))
+                call.respond(HttpStatusCode.BadRequest,SimpleResponse(false,"Wrong Email"))
             } else {
 
                 if(user.hashPassword == hashFunction(loginRequest.password)){
                     call.respond(HttpStatusCode.OK,SimpleResponse(true,jwtService.generateToken(user)))
                 } else{
-                    call.respond(HttpStatusCode.BadRequest,SimpleResponse(false,"Password Incorrect!"))
+                    call.respond(HttpStatusCode.OK,SimpleResponse(false,"Wrong password!"))
                 }
             }
         } catch (e:Exception){

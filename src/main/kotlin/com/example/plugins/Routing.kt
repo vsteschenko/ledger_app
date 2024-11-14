@@ -6,6 +6,7 @@ import com.example.data.model.User
 import com.example.repository.Repo
 import com.example.routes.TransactionRoutes
 import com.example.routes.UserRoutes
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -18,7 +19,7 @@ fun Application.configureRouting() {
     val db = Repo()
     val jwtService = JwtService()
     val hashFunction = { s:String -> hash(s) }
-
+    data class ApiResponse(val message: String, val status: Int)
     data class MySession(val count: Int = 0)
     install(Sessions) {
         cookie<MySession>("MY_SESSION") {
@@ -44,7 +45,8 @@ fun Application.configureRouting() {
         TransactionRoutes(db,hashFunction)
 
         get("/") {
-            call.respondText("Hello Arakis!")
+            val response = ApiResponse(message ="Hello Arakis", status=200)
+            call.respond(HttpStatusCode.OK, response)
         }
 
     }

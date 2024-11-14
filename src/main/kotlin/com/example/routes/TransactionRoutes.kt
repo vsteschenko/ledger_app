@@ -132,7 +132,6 @@ fun Route.TransactionRoutes(
                 val transactions = db.getAllTransactions(email)
                 val sortedTransactions = transactions.filter { it.category == category }
                 val sum = sortedTransactions.sumOf{it.amount}
-
                 call.respond(HttpStatusCode.OK,sum)
             } catch (e:Exception){
                 call.respond(HttpStatusCode.Conflict, emptyList<Transaction>())
