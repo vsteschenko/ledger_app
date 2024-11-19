@@ -21,6 +21,7 @@ const val DELETE_TXS = "$TXS/delete"
 const val SUM_TXS = "$TXS/sum"
 const val CATEGORY_TXS = "$TXS/category"
 const val CATEGORY_TXS_SUM = "$TXS/category/sum"
+const val TEST = "protected"
 
 @Location(CREATE_TXS)
 class TransactionCreateRoute
@@ -42,6 +43,11 @@ class TransactionGetCategoryRoute
 
 @Location(CATEGORY_TXS_SUM)
 class TransactionGetCategorySumRoute
+
+@Location(TEST)
+class TransactionGetTestRoute
+
+data class ApiResponse(val message: String, val status: Int)
 
 fun Route.TransactionRoutes(
     db: Repo,
@@ -135,6 +141,15 @@ fun Route.TransactionRoutes(
                 call.respond(HttpStatusCode.OK,sum)
             } catch (e:Exception){
                 call.respond(HttpStatusCode.Conflict, emptyList<Transaction>())
+            }
+        }
+        get<TransactionGetTestRoute>{
+            try {
+                val response = ApiResponse(message ="JWT is valid", status=200)
+                call.respond(HttpStatusCode.OK, response)
+            } catch(e:Exception) {
+                val response = ApiResponse(message ="JWT is invalid", status=200)
+                call.respond(HttpStatusCode.OK, response)
             }
         }
     }
