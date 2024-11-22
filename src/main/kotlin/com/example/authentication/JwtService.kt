@@ -11,7 +11,7 @@ class JwtService {
     private val jwtSecret = System.getenv("JWT_SECRET")
     private val algorithm = Algorithm.HMAC512(jwtSecret)
 
-    private val expirationTime = 60 * 1000
+    private val expirationTime = 60 * 60 * 1000
 
     val varifier:JWTVerifier = JWT
         .require(algorithm)

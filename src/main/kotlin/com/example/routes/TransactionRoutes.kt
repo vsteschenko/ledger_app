@@ -13,6 +13,7 @@ import io.ktor.server.locations.post
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 const val TXS = "$API_VERSION/txs"
 const val CREATE_TXS = "$TXS/create"
@@ -64,7 +65,8 @@ fun Route.TransactionRoutes(
 
             try {
                 val email = call.principal<User>()!!.email
-                val currentTime = LocalDateTime.now().toString() // FIX DATE AND TIME
+                val formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
+                val currentTime = LocalDateTime.now().format(formatter)
                 db.addTransaction(transaction, email, currentTime)
                 call.respond(HttpStatusCode.OK,SimpleResponse(true, "TX Added Successfully!"))
             } catch(e:Exception){
@@ -76,6 +78,7 @@ fun Route.TransactionRoutes(
                 val email = call.principal<User>()!!.email
                 val transactions = db.getAllTransactions(email)
                 call.respond(HttpStatusCode.OK,transactions)
+                println(transactions[0].date)
             } catch (e:Exception){
                 call.respond(HttpStatusCode.Conflict, emptyList<Transaction>())
             }
