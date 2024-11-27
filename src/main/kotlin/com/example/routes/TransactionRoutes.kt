@@ -22,6 +22,7 @@ const val DELETE_TXS = "$TXS/delete"
 const val SUM_TXS = "$TXS/sum"
 const val CATEGORY_TXS = "$TXS/category"
 const val CATEGORY_TXS_SUM = "$TXS/category/sum"
+const val FILTER_BY_DATE = "$TXS/filterByDate"
 const val TEST = "protected"
 
 @Location(CREATE_TXS)
@@ -35,6 +36,9 @@ class TransactionDeleteRoute
 
 @Location(TXS)
 class TransactionGetRoute
+
+@Location(FILTER_BY_DATE)
+class TransactionFilterByDateRoute
 
 @Location(SUM_TXS)
 class TransactionGetSumRoute
@@ -98,6 +102,51 @@ fun Route.TransactionRoutes(
                 call.respond(HttpStatusCode.Conflict,SimpleResponse(false, e.message ?: "Some Problem"))
             }
         }
+        get<TransactionFilterByDateRoute> {
+            try {
+                val email = call.principal<User>()!!.email
+                val monthName = call.request.queryParameters["month"]?.lowercase()
+                val year = call.request.queryParameters["year"]?.toIntOrNull()
+
+                if (monthName == null || year == null) {
+                    call.respond(HttpStatusCode.BadRequest, SimpleResponse(false, "Invalid or missing query parameters: month and year"))
+                    return@get
+                }
+
+                // Map month name to month number
+                val monthNumber = when (monthName) {
+                    "january" -> 1
+                    "february" -> 2
+                    "march" -> 3
+                    "april" -> 4
+                    "may" -> 5
+                    "june" -> 6
+                    "july" -> 7
+                    "august" -> 8
+                    "september" -> 9
+                    "october" -> 10
+                    "november" -> 11
+                    "december" -> 12
+                    else -> null
+                }
+
+                if (monthNumber == null) {
+                    call.respond(HttpStatusCode.BadRequest, SimpleResponse(false, "Invalid month name: $monthName"))
+                    return@get
+                }
+
+                val transactions = db.getAllTransactions(email)
+                val filteredTransactions = transactions.filter {
+                    val transactionDate = LocalDateTime.parse(it.date, DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy"))
+                    transactionDate.month.value == monthNumber && transactionDate.year == year
+                }
+
+                call.respond(HttpStatusCode.OK, filteredTransactions)
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.Conflict, SimpleResponse(false, e.message ?: "An error occurred"))
+            }
+        }
+
         delete<TransactionDeleteRoute> {
             val transactionId = try {
                 call.request.queryParameters["id"]!!.toInt()
