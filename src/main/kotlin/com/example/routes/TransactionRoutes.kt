@@ -24,9 +24,13 @@ const val CATEGORY_TXS = "$TXS/category"
 const val CATEGORY_TXS_SUM = "$TXS/category/sum"
 const val FILTER_BY_DATE = "$TXS/filterByDate"
 const val TEST = "protected"
+const val CREATE_TXS_WITH_TIME = "$TXS/create_with_time"
 
 @Location(CREATE_TXS)
 class TransactionCreateRoute
+
+@Location(CREATE_TXS_WITH_TIME)
+class TransactionCreateWithTimeRoute
 
 @Location(UPDATE_TXS)
 class TransactionUpdateRoute
@@ -77,6 +81,30 @@ fun Route.TransactionRoutes(
                 call.respond(HttpStatusCode.Conflict,SimpleResponse(false, e.message ?: "Some Problem"))
             }
         }
+        post<TransactionCreateWithTimeRoute>{
+            val transaction = try {
+                call.receive<Transaction>()
+            } catch (e:Exception) {
+                call.respond(HttpStatusCode.BadRequest, SimpleResponse(false, "Missing Fields"))
+                return@post
+            }
+
+            try {
+                val email = call.principal<User>()!!.email
+                val formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
+                var currentTime: String = ""
+                if(transaction.date == null) {
+                    currentTime = LocalDateTime.now().format(formatter)
+                } else {
+                    currentTime = transaction.date
+                }
+                db.addTransaction(transaction, email, currentTime)
+                call.respond(HttpStatusCode.OK,SimpleResponse(true, "TX Added Successfully!"))
+            } catch(e:Exception){
+                call.respond(HttpStatusCode.Conflict,SimpleResponse(false, e.message ?: "Some Problem"))
+            }
+        }
+
         get<TransactionGetRoute> {
             try {
                 val email = call.principal<User>()!!.email
@@ -113,7 +141,6 @@ fun Route.TransactionRoutes(
                     return@get
                 }
 
-                // Map month name to month number
                 val monthNumber = when (monthName) {
                     "january" -> 1
                     "february" -> 2
@@ -140,7 +167,6 @@ fun Route.TransactionRoutes(
                     val transactionDate = LocalDateTime.parse(it.date, DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy"))
                     transactionDate.month.value == monthNumber && transactionDate.year == year
                 }
-
                 call.respond(HttpStatusCode.OK, filteredTransactions)
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.Conflict, SimpleResponse(false, e.message ?: "An error occurred"))
