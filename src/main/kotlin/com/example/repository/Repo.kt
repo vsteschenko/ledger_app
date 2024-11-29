@@ -7,7 +7,8 @@ import com.example.data.table.UserTable
 import com.example.repository.DatabaseFactory.dbQuery
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import java.sql.Timestamp
+import java.time.LocalDateTime
+
 
 class Repo {
     suspend fun addUser(user:User){
@@ -40,7 +41,7 @@ class Repo {
 
     // TRANSACTIONS
 
-    suspend fun addTransaction(transaction:Transaction, email:String, currentTime: Timestamp){
+    suspend fun addTransaction(transaction:Transaction, email:String, currentTime: LocalDateTime){
         dbQuery {
 
             TransactionTable.insert {tt ->
@@ -50,7 +51,6 @@ class Repo {
                 tt[TransactionTable.date] = currentTime
                 tt[TransactionTable.amount] = transaction.amount
                 tt[TransactionTable.location] = transaction.location
-
             }
         }
     }

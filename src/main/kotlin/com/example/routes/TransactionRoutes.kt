@@ -92,13 +92,13 @@ fun Route.TransactionRoutes(
             try {
                 val email = call.principal<User>()!!.email
                 val currentTime = LocalDateTime.now()
-                val currentTimestamp = Timestamp.valueOf(currentTime)
+//                val currentTimestamp = Timestamp.valueOf(currentTime)
 //                val transactionWithTime = if (transaction.date == null) {
 //                    transaction.copy(date = currentTimestamp)
 //                } else {
 //                    transaction
 //                }
-                db.addTransaction(transaction, email, currentTimestamp)
+                db.addTransaction(transaction, email, currentTime)
                 call.respond(HttpStatusCode.OK,SimpleResponse(true, "TX Added Successfully!"))
             } catch(e:Exception){
                 call.respond(HttpStatusCode.Conflict,SimpleResponse(false, e.message ?: "Some Problem"))
@@ -164,7 +164,7 @@ fun Route.TransactionRoutes(
 
                 val transactions = db.getAllTransactions(email)
                 val filteredTransactions = transactions.filter {
-                    val transactionDate = LocalDateTime.parse(it.date, DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy"))
+                    val transactionDate = it.date
                     transactionDate.month.value == monthNumber && transactionDate.year == year
                 }
                 call.respond(HttpStatusCode.OK, filteredTransactions)
