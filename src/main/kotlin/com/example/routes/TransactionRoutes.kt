@@ -12,6 +12,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.locations.post
 import io.ktor.server.request.*
 import io.ktor.server.response.*
+import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -73,8 +74,7 @@ fun Route.TransactionRoutes(
 
             try {
                 val email = call.principal<User>()!!.email
-                val formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
-                val currentTime = LocalDateTime.now().format(formatter)
+                val currentTime = LocalDateTime.now()
                 db.addTransaction(transaction, email, currentTime)
                 call.respond(HttpStatusCode.OK,SimpleResponse(true, "TX Added Successfully!"))
             } catch(e:Exception){
@@ -91,14 +91,14 @@ fun Route.TransactionRoutes(
 
             try {
                 val email = call.principal<User>()!!.email
-                val formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
-                var currentTime: String = ""
-                if(transaction.date == null) {
-                    currentTime = LocalDateTime.now().format(formatter)
-                } else {
-                    currentTime = transaction.date
-                }
-                db.addTransaction(transaction, email, currentTime)
+                val currentTime = LocalDateTime.now()
+                val currentTimestamp = Timestamp.valueOf(currentTime)
+//                val transactionWithTime = if (transaction.date == null) {
+//                    transaction.copy(date = currentTimestamp)
+//                } else {
+//                    transaction
+//                }
+                db.addTransaction(transaction, email, currentTimestamp)
                 call.respond(HttpStatusCode.OK,SimpleResponse(true, "TX Added Successfully!"))
             } catch(e:Exception){
                 call.respond(HttpStatusCode.Conflict,SimpleResponse(false, e.message ?: "Some Problem"))

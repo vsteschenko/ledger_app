@@ -1,6 +1,7 @@
 package com.example.data.model
 
 import java.math.BigDecimal
+import java.sql.Timestamp
 
 data class Transaction(
     val id:Int,
@@ -9,5 +10,5 @@ data class Transaction(
     val location:String,
     val comment:String,
     val userEmail:String,
-    val date:String,
+    val date: Timestamp,
 )

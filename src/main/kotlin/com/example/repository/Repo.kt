@@ -7,6 +7,7 @@ import com.example.data.table.UserTable
 import com.example.repository.DatabaseFactory.dbQuery
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import java.sql.Timestamp
 
 class Repo {
     suspend fun addUser(user:User){
@@ -39,7 +40,7 @@ class Repo {
 
     // TRANSACTIONS
 
-    suspend fun addTransaction(transaction:Transaction, email:String, currentTime:String){
+    suspend fun addTransaction(transaction:Transaction, email:String, currentTime: Timestamp){
         dbQuery {
 
             TransactionTable.insert {tt ->
