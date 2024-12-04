@@ -168,12 +168,15 @@ fun Route.TransactionRoutes(
                 }
 
                 val transactions = db.getAllTransactions(email)
-//                val filteredTransactions = transactions.filter {
-//                    val transactionDate = it.date
-//                    transactionDate.month.value == monthNumber && transactionDate.year == year
-//                }
-//                call.respond(HttpStatusCode.OK, filteredTransactions)
-                call.respond(HttpStatusCode.OK, transactions) //to be fixed
+//                println(LocalDateTime.parse(transactions[0].date).month)
+//                println(LocalDateTime.parse(transactions[0].date).year)
+
+                val filteredTransactions = transactions.filter {
+                    val txMonth = LocalDateTime.parse(it.date).month.toString()
+                    val txYear = LocalDateTime.parse(it.date).year
+                    txMonth == monthName.uppercase() && txYear == year
+                }
+                call.respond(HttpStatusCode.OK, filteredTransactions)
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.Conflict, SimpleResponse(false, e.message ?: "An error occurred"))
             }
