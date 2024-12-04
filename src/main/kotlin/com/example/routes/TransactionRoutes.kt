@@ -12,9 +12,9 @@ import io.ktor.server.routing.*
 import io.ktor.server.locations.post
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
 
 const val TXS = "$API_VERSION/txs"
 const val CREATE_TXS = "$TXS/create"
@@ -58,6 +58,7 @@ class TransactionGetCategorySumRoute
 class TransactionGetTestRoute
 
 data class ApiResponse(val message: String, val status: Int)
+val isoDateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 fun Route.TransactionRoutes(
     db: Repo,
@@ -108,9 +109,13 @@ fun Route.TransactionRoutes(
         get<TransactionGetRoute> {
             try {
                 val email = call.principal<User>()!!.email
-                val transactions = db.getAllTransactions(email)
+                val transactions = db.getAllTransactions(email).map {tx ->
+                    tx.copy(
+                        date = tx.date?.format(isoDateTimeFormatter)
+                    )
+                }
                 call.respond(HttpStatusCode.OK,transactions)
-                println(transactions[0].date)
+
             } catch (e:Exception){
                 call.respond(HttpStatusCode.Conflict, emptyList<Transaction>())
             }
@@ -163,11 +168,12 @@ fun Route.TransactionRoutes(
                 }
 
                 val transactions = db.getAllTransactions(email)
-                val filteredTransactions = transactions.filter {
-                    val transactionDate = it.date
-                    transactionDate.month.value == monthNumber && transactionDate.year == year
-                }
-                call.respond(HttpStatusCode.OK, filteredTransactions)
+//                val filteredTransactions = transactions.filter {
+//                    val transactionDate = it.date
+//                    transactionDate.month.value == monthNumber && transactionDate.year == year
+//                }
+//                call.respond(HttpStatusCode.OK, filteredTransactions)
+                call.respond(HttpStatusCode.OK, transactions) //to be fixed
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.Conflict, SimpleResponse(false, e.message ?: "An error occurred"))
             }

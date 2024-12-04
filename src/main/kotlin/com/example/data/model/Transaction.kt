@@ -1,7 +1,6 @@
 package com.example.data.model
 
 import java.math.BigDecimal
-import java.time.LocalDateTime
 
 data class Transaction(
     val id: Int,
@@ -10,5 +9,5 @@ data class Transaction(
     val location: String,
     val comment: String,
     val userEmail: String,
-    val date: LocalDateTime,
+    val date: String?,
 )

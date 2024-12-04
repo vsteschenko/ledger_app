@@ -91,7 +91,7 @@ class Repo {
             id = row[TransactionTable.id],
             comment = row[TransactionTable.comment],
             category = row[TransactionTable.category],
-            date = row[TransactionTable.date],
+            date = row[TransactionTable.date].toString(),
             amount = row[TransactionTable.amount],
             location = row[TransactionTable.location],
             userEmail = row[TransactionTable.userEmail]
