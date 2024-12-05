@@ -146,27 +146,6 @@ fun Route.TransactionRoutes(
                     return@get
                 }
 
-                val monthNumber = when (monthName) {
-                    "january" -> 1
-                    "february" -> 2
-                    "march" -> 3
-                    "april" -> 4
-                    "may" -> 5
-                    "june" -> 6
-                    "july" -> 7
-                    "august" -> 8
-                    "september" -> 9
-                    "october" -> 10
-                    "november" -> 11
-                    "december" -> 12
-                    else -> null
-                }
-
-                if (monthNumber == null) {
-                    call.respond(HttpStatusCode.BadRequest, SimpleResponse(false, "Invalid month name: $monthName"))
-                    return@get
-                }
-
                 val transactions = db.getAllTransactions(email)
 //                println(LocalDateTime.parse(transactions[0].date).month)
 //                println(LocalDateTime.parse(transactions[0].date).year)
