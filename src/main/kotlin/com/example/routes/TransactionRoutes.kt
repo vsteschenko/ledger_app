@@ -89,18 +89,14 @@ fun Route.TransactionRoutes(
                 call.respond(HttpStatusCode.BadRequest, SimpleResponse(false, "Missing Fields"))
                 return@post
             }
-
+            println(transaction)
             try {
-                val email = call.principal<User>()!!.email
-                val currentTime = LocalDateTime.now()
-//                val currentTimestamp = Timestamp.valueOf(currentTime)
-//                val transactionWithTime = if (transaction.date == null) {
-//                    transaction.copy(date = currentTimestamp)
-//                } else {
-//                    transaction
-//                }
-                db.addTransaction(transaction, email, currentTime)
-                call.respond(HttpStatusCode.OK,SimpleResponse(true, "TX Added Successfully!"))
+//                val email = call.principal<User>()!!.email
+//                val currentTime = LocalDateTime.now()
+//                println(transaction)
+//
+//                db.addTransaction(transaction, email, currentTime)
+//                call.respond(HttpStatusCode.OK,SimpleResponse(true, "TX Added Successfully!"))
             } catch(e:Exception){
                 call.respond(HttpStatusCode.Conflict,SimpleResponse(false, e.message ?: "Some Problem"))
             }

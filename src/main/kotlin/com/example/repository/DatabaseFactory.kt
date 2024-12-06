@@ -27,8 +27,8 @@ object DatabaseFactory {
         val jdbcDriver = System.getenv("JDBC_DRIVER")
         val databaseUrl = System.getenv("DATABASE_URL")
 
-        println("JDBC_DRIVER: $jdbcDriver")
-        println("DATABASE_URL: $databaseUrl")
+//        println("JDBC_DRIVER: $jdbcDriver")
+//        println("DATABASE_URL: $databaseUrl")
 
         config.driverClassName = System.getenv("JDBC_DRIVER")
         config.jdbcUrl = System.getenv("DATABASE_URL")
