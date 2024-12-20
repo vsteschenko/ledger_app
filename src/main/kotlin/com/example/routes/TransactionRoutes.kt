@@ -89,17 +89,28 @@ fun Route.TransactionRoutes(
                 call.respond(HttpStatusCode.BadRequest, SimpleResponse(false, "Missing Fields"))
                 return@post
             }
-            println(transaction)
             try {
-//                val email = call.principal<User>()!!.email
-//                val currentTime = LocalDateTime.now()
-//                println(transaction)
-//
-//                db.addTransaction(transaction, email, currentTime)
-//                call.respond(HttpStatusCode.OK,SimpleResponse(true, "TX Added Successfully!"))
-            } catch(e:Exception){
-                call.respond(HttpStatusCode.Conflict,SimpleResponse(false, e.message ?: "Some Problem"))
+                val monthName = call.request.queryParameters["month"]?.lowercase()
+                val year = call.request.queryParameters["year"]?.toIntOrNull()
+                if (monthName == null || year == null) {
+                    call.respond(HttpStatusCode.BadRequest, SimpleResponse(false, "Invalid or missing query parameters: month and year"))
+                    return@post
+                }
+                val monthValue = try {
+                    java.time.Month.valueOf(monthName.uppercase()).value
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest, SimpleResponse(false, "Invalid month name"))
+                    return@post
+                }
+                val email = call.principal<User>()!!.email
+                val currentTime = LocalDateTime.now()
+                val updatedDateTime = currentTime.withYear(year).withMonth(monthValue)
+                db.addTransaction(transaction, email, updatedDateTime)
+                call.respond(HttpStatusCode.OK, SimpleResponse(true, "TX Added Successfully!"))
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.Conflict, SimpleResponse(false, e.message ?: "Some Problem"))
             }
+
         }
 
         get<TransactionGetRoute> {
